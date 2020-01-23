@@ -11,7 +11,7 @@ The scripts in "Rhino" folder help in re-prodcution of the results (i.e. form, f
 
 To cite the work, please use below BibTeX:
 
-@Misc{ags_opt_2020,<br/>
+@misc{ags_opt,<br/>
 author = {Mozaffari, Salma},<br/>
 title = {AGS_OPT: The integration of Algebraic Graphic Statics and Layout Optimization.},<br/>
 year = {2020},<br/>
