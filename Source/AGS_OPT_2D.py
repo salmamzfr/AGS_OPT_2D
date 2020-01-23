@@ -15,7 +15,7 @@ Before running the code:
 
 After a correct run:
         - three plots of form diagram (optimized truss), force diagram, and uneditted stress fields will appear.
-        - the necessary ".p" files will be saved in "Source" folder to be used for drawing in Rhino using "Draw_Duals_Rh" and "Draw_SF_Rh".
+        - the necessary ".p" files will be saved in "Source" folder to be used for drawing in Rhino using "Draw_Diagrams_Rh" and "Draw_SF_Rh".
 '''
 "################################################ IMPORTS ###################################################"
 
@@ -615,7 +615,7 @@ dic_load={20:[0.0, -100.0]}
 #************ get the initial meshed concrete block and create ground truss ************
 AO=AGS_OPT_2D(dic_sup, dic_load)
 # !!! ENTER THE CORRECT DIRECTORY BELOW: !!!
-AO.create_mesh(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\AGS_OPT_2D\MeshObjects\mesh_cant.obj')
+AO.create_mesh(r'C:\Users\msalma\...\AGS_OPT_2D\MeshObjects\mesh_cant.obj')
 # hf.plot_mesh(AO.dic_attr['mesh'])  #!uncomment to see the ground truss 
 AO.struct_domain(AO.dic_attr['mesh'])
 AO.generate_ground_truss()
