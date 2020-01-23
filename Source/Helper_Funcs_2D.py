@@ -25,6 +25,8 @@ from compas.numerical.matrices import connectivity_matrix
 from compas.utilities import geometric_key
 from compas_plotters import MeshPlotter
 from compas_plotters import NetworkPlotter
+import os
+BASEDIR = os.path.dirname(os.path.realpath(__file__))
 
 "##################################################################################################################"
 "################################################ HELPER FUNCTIONS ################################################"
@@ -614,9 +616,9 @@ def ags_inputs(network):
     for ind_edg, edg in enumerate(ags_net.edges()):
         edg_dic[ind_edg]=edg  
     
-    with open('ver_dic_GT.p', 'wb') as fp: 
+    with open(os.path.join(BASEDIR, 'ver_dic_GT.p'), 'wb') as fp: 
         pickle.dump(ver_dic, fp, protocol=2)
-    with open('edg_dic_GT.p', 'wb') as fp:
+    with open(os.path.join(BASEDIR, 'edg_dic_GT.p'), 'wb') as fp:
         pickle.dump(edg_dic, fp, protocol=2)
         
     return ags_net        
@@ -926,7 +928,7 @@ def sf_rhino_inputs(hull_lis, ten_lines_dic):
         for simplex in hull.simplices:
             hull_dic[ind].append(hull.points[simplex].tolist())     
 
-    with open('hull_dic.p', 'wb') as fp:
+    with open(os.path.join(BASEDIR, 'hull_dic.p'), 'wb') as fp:
         pickle.dump(hull_dic, fp, protocol=2)
-    with open('ten_lines_dic.p', 'wb') as fp:
+    with open(os.path.join(BASEDIR, 'ten_lines_dic.p'), 'wb') as fp:
         pickle.dump(ten_lines_dic, fp, protocol=2)  

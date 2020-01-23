@@ -9,13 +9,13 @@ Comment: Integration of AGS and LAYOPT:
 
 Before running the code:
         - install required packages: matplotlib, numpy, scipy, cvxpy, and compas.
-        - in the RUN section, update the directory to the "MeshObjects" folder and the specific mesh object according to your computer directory.
+        - in the RUN section, update the directory to the "MeshObjects" folder and the specific mesh object according to your directory.
         - in the INPUTS section, uncomment the "dic_sup" and "dic_load" to impose boundary conditions (supports and external loads) on the mesh object.
         - in the RUN section, uncomment "hf.plot_network(AO.dic_attr['gt_net'])" to see/check ground truss and the locations of supports/external loads
 
 After a correct run:
         - three plots of form diagram (optimized truss), force diagram, and uneditted stress fields will appear.
-        - the necessary ".p" files will be saved in "ACG_OPT_repo" folder to be used for drawing in Rhino using "Draw_Duals_Rh" and "Draw_SF_Rh".
+        - the necessary ".p" files will be saved in "Source" folder to be used for drawing in Rhino using "Draw_Duals_Rh" and "Draw_SF_Rh".
 '''
 "################################################ IMPORTS ###################################################"
 
@@ -31,6 +31,8 @@ from compas.datastructures.network import Network
 from compas.numerical.matrices import connectivity_matrix
 from compas.numerical.matrices import equilibrium_matrix
 from compas.geometry import scale_points
+import os
+BASEDIR = os.path.dirname(os.path.realpath(__file__))
 
 "################################################ CLASS ###################################################"
 
@@ -522,11 +524,11 @@ class AGS_OPT_2D (object):
             dual_ver_dic[key]=force_net.vertex_coordinates(key)
 
         # ### save the data to draw form and force diagrams in Rhino ###
-        with open('map_edg_dic.p', 'wb') as fp:
+        with open(os.path.join(BASEDIR, 'map_edg_dic.p'), 'wb') as fp:
             pickle.dump(map_edg_dic, fp, protocol=2)
-        with open('new_edg_f_dic.p', 'wb') as fp:
+        with open(os.path.join(BASEDIR, 'new_edg_f_dic.p'), 'wb') as fp:
             pickle.dump(new_edg_f_dic, fp, protocol=2)
-        with open('dual_ver_dic.p', 'wb') as fp:
+        with open(os.path.join(BASEDIR, 'dual_ver_dic.p'), 'wb') as fp:
             pickle.dump(dual_ver_dic, fp, protocol=2)          
 
         self.dic_attr['map_edg_dic']=map_edg_dic
@@ -613,7 +615,7 @@ dic_load={20:[0.0, -100.0]}
 #************ get the initial meshed concrete block and create ground truss ************
 AO=AGS_OPT_2D(dic_sup, dic_load)
 # !!! ENTER THE CORRECT DIRECTORY BELOW: !!!
-AO.create_mesh(r'C:\Users\...\AGS_OPT_2D\MeshObjects\mesh_cant.obj')
+AO.create_mesh(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\AGS_OPT_2D\MeshObjects\mesh_cant.obj')
 # hf.plot_mesh(AO.dic_attr['mesh'])  #!uncomment to see the ground truss 
 AO.struct_domain(AO.dic_attr['mesh'])
 AO.generate_ground_truss()
@@ -631,10 +633,9 @@ AO.dic_attr['gtopt_net']=gtopt_net
 # hf.plot_network(gtopt_net)
 
 # *********** inputs for AGS ************
-with open('ver_dic_GT.p', 'rb') as fp:
+with open(os.path.join(BASEDIR, 'ver_dic_GT.p'), 'rb') as fp:
     AO.dic_attr['ver_dic']=pickle.load(fp)
-
-with open('edg_dic_GT.p', 'rb') as fp:
+with open(os.path.join(BASEDIR, 'edg_dic_GT.p'), 'rb') as fp:
     AO.dic_attr['edg_dic']=pickle.load(fp)
 
 # ************ initialize AGS >> OPT ************

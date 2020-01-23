@@ -4,7 +4,7 @@ Created on 09.05.2018, updated on 23.01.2020
 @author: Salma Mozaffari, ETH Zurich
 
 Before running the code:
-    update the directories in "import files" according to your computer directory.
+    update the directories below "import files" according to your directory.
 '''
 import rhinoscriptsyntax as rs
 import cPickle as pickle
@@ -14,14 +14,14 @@ if not rs.IsLayer("comp"):
 if not rs.IsLayer("ten"):
     rs.AddLayer("ten", (255, 0, 0))
 
-# import files
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\ver_dic_GT.p', 'rb') as fp:
+# import files !!! ENTER THE CORRECT DIRECTORY BELOW: !!!
+with open(r'C:\Users\...\AGS_OPT_2D\Source\ver_dic_GT.p', 'rb') as fp:
     ver_dic=pickle.load(fp)
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\new_edg_f_dic.p', 'rb') as fp:
+with open(r'C:\Users\...\AGS_OPT_2D\Source\new_edg_f_dic.p', 'rb') as fp:
     edg_f_dic=pickle.load(fp)
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\map_edg_dic.p', 'rb') as fp:
+with open(r'C:\Users\...\AGS_OPT_2D\Source\map_edg_dic.p', 'rb') as fp:
     map_edg_dic=pickle.load(fp)
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\dual_ver_dic.p', 'rb') as fp:
+with open(r'C:\Users\msalma\...\AGS_OPT_2D\Source\dual_ver_dic.p', 'rb') as fp:
     dual_ver_dic=pickle.load(fp)
 
 

@@ -4,7 +4,7 @@ Created on 20.06.2018, updated on 23.01.2020
 @author: Salma Mozaffari, ETH Zurich
 
 Before running the code:
-    update the directories in "import files" according to your computer directory.
+    update the directories below "import files" according to your directory.
 '''
 import rhinoscriptsyntax as rs
 import cPickle as pickle
@@ -19,13 +19,13 @@ if not rs.IsLayer("sf"):
 SC=(1.0, 1.0, 1.0)
 ORIG=(0.0, 0.0, 0.0)
 
-# Import files from workscpase
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\hull_dic.p', 'rb') as fp:
+# import files !!! ENTER THE CORRECT DIRECTORY BELOW: !!!
+with open(r'C:\Users\...\AGS_OPT_2D\Source\hull_dic.p', 'rb') as fp:
     hull_dic=pickle.load(fp)
-with open(r'C:\Users\msalma\Desktop\Research\Computation\Git_Repos\PhD_Repo\source\AGS_OPT_repo\ten_lines_dic.p', 'rb') as fp:
+with open(r'C:\Users\...\AGS_OPT_2D\Source\ten_lines_dic.p', 'rb') as fp:
     ten_lines_dic=pickle.load(fp)
 
-# Draw the compresson stress fields
+# draw compresson stress fields
 for seg_lis in hull_dic.values():
     for seg in seg_lis:
         pt_1=(seg[0][0], seg[0][1], 0.0)
@@ -35,7 +35,7 @@ for seg_lis in hull_dic.values():
         rs.ScaleObject(object_id, ORIG, SC, copy=False)
         rs.ObjectLayer(rs.FirstObject(),"sf")
 
-# Draw the tension ties and anchoring regions
+# draw tension ties and anchoring regions
 for lines in ten_lines_dic.values():
     line_1=lines[0]
     pt_1=(line_1[0][0], line_1[0][1], 0.0)
