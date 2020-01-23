@@ -12,10 +12,15 @@ The scripts in "Rhino" folder help in re-prodcution of the results (i.e. form, f
 To cite the work, please use below BibTeX:
 
 @Misc{ags_opt_2020,
+
 author = {Mozaffari, Salma},
-title = {{AGS_OPT: The integration of Algebraic Graphic Statics and Layout Optimization.}},
+
+title = {AGS_OPT: The integration of Algebraic Graphic Statics and Layout Optimization.},
+
 year = {2020},
+
 url = {https://github.com/salmamzfr/AGS_OPT_2D},
+
 }
 
 In case of questions, please contact mozaffari@ibk.baug.ethz.ch
