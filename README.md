@@ -1,4 +1,4 @@
-# AGS_OPT_2D
+# AGS-OPT
 
 ## The integration of Algebraic Graphic Statics and Layout Optimization
 
@@ -14,7 +14,7 @@ To cite the work, please use below BibTeX:
 
 @misc{ags-opt,<br/>
   author = {Mozaffari, Salma},<br/>
-  title = {AGS_OPT: The integration of Algebraic Graphic Statics and Layout Optimization.},<br/>
+  title = {AGS-OPT: The integration of Algebraic Graphic Statics and Layout Optimization.},<br/>
   year = {2020},<br/>
   url = { https://github.com/salmamzfr/AGS_OPT_2D },<br/>
 }
