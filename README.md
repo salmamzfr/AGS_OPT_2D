@@ -1,5 +1,5 @@
 # AGS-OPT
-https://zenodo.org/badge/DOI/10.5281/zenodo.3628672.svg
+https://zenodo.org/badge/latestdoi/235868917
 
 ## The integration of Algebraic Graphic Statics and Layout Optimization
 
