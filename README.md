@@ -1,4 +1,5 @@
 # AGS-OPT
+https://zenodo.org/badge/DOI/10.5281/zenodo.3628672.svg
 
 ## The integration of Algebraic Graphic Statics and Layout Optimization
 
@@ -16,6 +17,8 @@ To cite the work, please use below BibTeX:
   author = {Mozaffari, Salma},<br/>
   title = {AGS-OPT: The integration of Algebraic Graphic Statics and Layout Optimization},<br/>
   year = {2020},<br/>
+  version = {1.0.0},<br/>
+  doi = {10.5281/zenodo.3628672},<br/>
   url = { https://github.com/salmamzfr/AGS_OPT_2D },<br/>
 }
 
