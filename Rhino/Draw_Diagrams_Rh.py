@@ -38,6 +38,3 @@ for edg, f in edg_f_dic.items():
         line_1=rs.AddLine(pt_1, pt_2)
         line_2=rs.AddLine(dl_pt_1, dl_pt_2)
         rs.ObjectLayer([line_1, line_2], "comp")
-
-# draw "unadjusted" stress fields
-

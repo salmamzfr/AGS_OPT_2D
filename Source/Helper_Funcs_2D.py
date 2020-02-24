@@ -1,5 +1,5 @@
 '''
-Created on 13.04.2018, updated on 22.01.2020
+Created on 13.04.2018, updated on 24.02.2020
 
 @author: Salma Mozaffari, ETH Zurich
 
@@ -15,7 +15,7 @@ from scipy.spatial import ConvexHull
 from compas.datastructures import Mesh 
 from compas.datastructures.network import Network
 from compas.datastructures import network_find_crossings
-from compas.datastructures import network_find_faces
+from compas.datastructures import network_find_cycles
 from compas.geometry import Polygon
 from compas.geometry import Polyline
 from compas.geometry import is_point_in_polygon_xy
@@ -105,8 +105,8 @@ def edge_length(network, edg):
     """
     returns an edge length of a network
     """
-    coor_1=network.vertex_coordinates(edg[0])
-    coor_2=network.vertex_coordinates(edg[1])
+    coor_1=network.node_coordinates(edg[0])
+    coor_2=network.node_coordinates(edg[1])
     edg_len=distance_between_two_points(coor_1, coor_2)
 
     return edg_len
@@ -140,23 +140,6 @@ def lines_intersection_xy(line_1, line_2):
     else:
         return None
 
-def segments_intersection_xy(line_1, line_2):
-    """
-    returns the intersection point (coordinates) of two segments 
-    """
-    int_pt=lines_intersection_xy(line_1, line_2)
-    if int_pt!=None:
-        len_1=distance_between_two_points(line_1[0], line_1[1])
-        len_2=distance_between_two_points(line_2[0], line_2[1])
-        dis_11=distance_between_two_points(int_pt, line_1[0])
-        dis_12=distance_between_two_points(int_pt, line_1[1])
-        dis_21=distance_between_two_points(int_pt, line_2[0])
-        dis_22=distance_between_two_points(int_pt, line_2[1])
-        if dis_11<=len_1 and dis_12<=len_1 and dis_21<=len_2 and dis_22<=len_2:
-            return int_pt
-    else:
-        return int_pt
-
 def leaf_edges(network):
     """
     returns leaf edges of the "compas" network as a list 
@@ -164,7 +147,7 @@ def leaf_edges(network):
     leaf_ver_lis=network.leaves() 
     leaf_edg_lis=[]
     for key in leaf_ver_lis:
-        edg=network.vertex_connected_edges(key) 
+        edg=network.connected_edges(key) 
         leaf_edg_lis.append(edg[0])
     
     return leaf_edg_lis
@@ -176,7 +159,7 @@ def leaf_pair_dict(network):
     """
     leaf_edg_lis=leaf_edges(network)
     leaf_ver_lis=network.leaves()
-    leaf_nbr_set=set([network.vertex_neighbors(key)[0] for key in leaf_ver_lis])
+    leaf_nbr_set=set([network.neighbors(key)[0] for key in leaf_ver_lis])
     leaf_pair_dic={k:[] for k in leaf_nbr_set}
     for k in leaf_pair_dic:
         for edg in leaf_edg_lis:
@@ -214,7 +197,7 @@ def plot_network(network):
     Compas Network Plotter
     """
     plotter=NetworkPlotter(network)
-    plotter.draw_vertices(radius=0.001, text='key', fontsize=15.0, facecolor=(0, 0, 0)) 
+    plotter.draw_nodes(radius=0.001, text='key', fontsize=15.0, facecolor=(0, 0, 0)) 
     plotter.draw_edges() 
     plotter.show()
 
@@ -277,10 +260,10 @@ def rotate_leaves_for_face_rec(ags_net, gtopt_net, plygn, plyln):
     ags_net_rot=gtopt_net.copy()
     leaf_pair_dic=leaf_pair_dict(ags_net)
     for key, pair in leaf_pair_dic.items():
-        coor_key=ags_net.vertex_coordinates(pair[0][0])  # the common coordinate
+        coor_key=ags_net.node_coordinates(pair[0][0])  # the common coordinate
         if len(pair)>1:  # if they are two pairs (sup/load) at one node
-            coor_12=ags_net.vertex_coordinates(pair[0][1])
-            coor_22=ags_net.vertex_coordinates(pair[1][1])
+            coor_12=ags_net.node_coordinates(pair[0][1])
+            coor_22=ags_net.node_coordinates(pair[1][1])
             plyln_bln_1=is_point_on_polyline(coor_12, plyln.points, tol=0.1)
             plyln_bln_2=is_point_on_polyline(coor_22, plyln.points, tol=0.1)
             if plyln_bln_1 or plyln_bln_2:  # the case when one is on polyline        
@@ -296,17 +279,17 @@ def rotate_leaves_for_face_rec(ags_net, gtopt_net, plygn, plyln):
                     coor_o=coor_12
                 add_vec=add_vectors(vector_create(coor_o, coor_key).tolist(), vector_create(coor_g, coor_key).tolist())
                 add_pt=subtract_vectors(coor_key, add_vec)  # bcs the origin is the key_coor
-                ags_net_rot.add_vertex(key_g, {'x': add_pt[0], 'y': add_pt[1], 'z': add_pt[2]})
-                ags_net_rot.add_vertex(key_o, {'x': coor_o[0], 'y': coor_o[1], 'z': coor_o[2]})
+                ags_net_rot.add_node(key_g, {'x': add_pt[0], 'y': add_pt[1], 'z': add_pt[2]})
+                ags_net_rot.add_node(key_o, {'x': coor_o[0], 'y': coor_o[1], 'z': coor_o[2]})
                 ags_net_rot.add_edge(key, key_g)
                 ags_net_rot.add_edge(key, key_o)
             else:  # the case when both are not on polyline 
-                ags_net_rot.add_vertex(pair[0][1], {'x': coor_12[0], 'y': coor_12[1], 'z': coor_12[2]})
-                ags_net_rot.add_vertex(pair[1][1], {'x': coor_22[0], 'y': coor_22[1], 'z': coor_22[2]})
+                ags_net_rot.add_node(pair[0][1], {'x': coor_12[0], 'y': coor_12[1], 'z': coor_12[2]})
+                ags_net_rot.add_node(pair[1][1], {'x': coor_22[0], 'y': coor_22[1], 'z': coor_22[2]})
                 ags_net_rot.add_edge(key, pair[0][1])
                 ags_net_rot.add_edge(key, pair[1][1])  
         else:  # for single leaf
-            coor_12=ags_net.vertex_coordinates(pair[0][1])
+            coor_12=ags_net.node_coordinates(pair[0][1])
             plyln_bln=is_point_on_polyline(coor_12, plyln.points, tol=0.1)
             if plyln_bln:
                 uv=unit_vector(vector_create(coor_key, coor_12))
@@ -320,10 +303,10 @@ def rotate_leaves_for_face_rec(ags_net, gtopt_net, plygn, plyln):
                     plygn_bln=is_point_in_polygon_xy(coor_12, plygn.points)
                     if plygn_bln:
                         coor_g=add_vectors(coor_g, (0.0,-1.0, 0.0))            
-                ags_net_rot.add_vertex(pair[0][1], {'x': coor_g[0], 'y': coor_g[1], 'z': coor_g[2]})
+                ags_net_rot.add_node(pair[0][1], {'x': coor_g[0], 'y': coor_g[1], 'z': coor_g[2]})
                 ags_net_rot.add_edge(key, pair[0][1])
             else:  # when already in the correct position
-                ags_net_rot.add_vertex(pair[0][1], {'x': coor_12[0], 'y': coor_12[1], 'z': coor_12[2]})
+                ags_net_rot.add_node(pair[0][1], {'x': coor_12[0], 'y': coor_12[1], 'z': coor_12[2]})
                 ags_net_rot.add_edge(key, pair[0][1])
     # plot_network(ags_net_rot)
     
@@ -345,14 +328,12 @@ def get_halfedge_face(network):
     """
     returns halfedge and face dictionary of the network
     """
-    net=network.copy()
-    mesh=Mesh()
-    for key, attr in network.vertices(True):
-        mesh.add_vertex(key, x=attr['x'], y=attr['y'], z=attr['z'])
-    mesh.halfedge=net.halfedge
-    network_find_faces(mesh, mesh.leaves())
+    points={key: network.node_coordinates(key) for key in network.nodes()}
+    cycles=network_find_cycles(network, network.leaves())
+    mesh=Mesh.from_vertices_and_faces(points, cycles)
+    
     dic_he=mesh.halfedge 
-    dic_fc=mesh.face 
+    dic_fc=mesh.face  
     
     return dic_he, dic_fc
 
@@ -372,7 +353,7 @@ def make_network(ver_dic, edg_dic):
     """
     net=Network()
     for ind, ver in ver_dic.items():
-        net.add_vertex(ind, {'x': ver[0], 'y': ver[1], 'z': ver[2]})
+        net.add_node(ind, {'x': ver[0], 'y': ver[1], 'z': ver[2]})
     for edg in edg_dic.values():
         net.add_edge(edg[0], edg[1])
     
@@ -389,14 +370,14 @@ def process_aligned_edges(network):
     returns the cured network and add_rmv_edg_dic={new_edg: (old_edg1, old_edg2)}
     """
     pnt_net=network.copy()
-    for key in network.vertex:
+    for key in network.node:
         # check which vertex has degree 2
-        if pnt_net.vertex_degree(key)==2:
+        if pnt_net.degree(key)==2:
             # find its neighbours
-            nbr_lis=pnt_net.vertex_neighbors(key)
+            nbr_lis=pnt_net.neighbors(key)
             # find the angle between two edges
-            vec_1=vector_create(pnt_net.vertex_coordinates(nbr_lis[0]), pnt_net.vertex_coordinates(key))
-            vec_2=vector_create(pnt_net.vertex_coordinates(nbr_lis[1]), pnt_net.vertex_coordinates(key))
+            vec_1=vector_create(pnt_net.node_coordinates(nbr_lis[0]), pnt_net.node_coordinates(key))
+            vec_2=vector_create(pnt_net.node_coordinates(nbr_lis[1]), pnt_net.node_coordinates(key))
             ang=angle_between(vec_1, vec_2)
             if round(ang, 2)==0.00 or round(ang, 2)==3.14:
                 pnt_net.delete_vertex(key)
@@ -416,121 +397,40 @@ def process_leaves(network, dic_load, all_bln):
     for key in leaf_ver_lis:
         if key in dic_load:
             # there is just one neighbour to the leaf vertex
-            key_neighbour=network.vertex_neighbors(key)[0]
+            key_neighbour=network.neighbors(key)[0]
             key_removed[key]={key_neighbour: dic_load[key]}
-            network.delete_vertex(key)
+            network.delete_node(key)
         if all_bln is True:
-            network.delete_vertex(key)
+            network.delete_node(key)
     # to be used in "add_vertex_edge_for_support_load"
     key_removed_dic=key_removed.copy()
     
     return network, key_removed_dic
 
-def check_point_with_vertices(pt_coor, network):
-    """
-    Process_Crossings Function(used in "add_vertex_at_crossings"): 
-    Check if a point is already exists in a list of vertices.
-    if True: returns the vertex key
-    else: returns None
-    Note: precision could be adjusted.
-    """
-    vertices=network.vertices()
-    pt_coor_formatted=geometric_key(pt_coor, precision='3f')  # tolerance=1e-1
-    ver_coor_lis=[network.vertex_coordinates(ver) for ver in vertices]
-    # map geometric keys (formatted xyz) to network vertices keys
-    geo_key_lis=[geometric_key(xyz, precision='3f') for xyz in ver_coor_lis]
-    ver_key_lis=[key for key in network.vertices()]
-    geo_key_dic=dict(zip(geo_key_lis, ver_key_lis))
-    if pt_coor_formatted in geo_key_dic:
-        ver_key=geo_key_dic.get(pt_coor_formatted)
-        return ver_key
-    else:
-        return None
-
-def add_vertex_at_crossings(network):
-    """
-    Process Crossings Function: (used in "sort_vertices_on_edge")
-    adds vertex at crossings if it is not already there.
-    returns dictionary of added vertices on each edge {crossed_edge_tup:on_edg_ver_key_lis}
-    """
-    edg_crossings_lis=network_find_crossings(network)  # [(edg1_tup,edg2_tup), (( , ) , ( , )), ...]    
-    # make a list of edges which have crossings
-    cross_edg_set=set()
-    for tup in edg_crossings_lis:
-        if (tup[0][1], tup[0][0]) not in cross_edg_set:  # not to add reverse repetative edge
-            cross_edg_set.add(tup[0])
-        if (tup[1][1], tup[1][0]) not in cross_edg_set:
-            cross_edg_set.add(tup[1])
-    # make a dict of {crossed_edge_tup:on_edg_ver_key_lis}
-    ver_on_edg_dic={edg: [] for edg in cross_edg_set}
-    for tup in edg_crossings_lis:
-        tup_1=tup[0]
-        tup_2=tup[1]
-        if tup[0] not in cross_edg_set:  # to reverse the repetative edge
-            tup_1=(tup[0][1], tup[0][0])  
-        if tup[1] not in cross_edg_set:  # to reverse the repetative edge
-            tup_2=(tup[1][1], tup[1][0]) 
-        tup_coor_1=(network.vertex_coordinates(tup_1[0]), network.vertex_coordinates(tup_1[1]))
-        tup_coor_2=(network.vertex_coordinates(tup_2[0]), network.vertex_coordinates(tup_2[1]))
-        x, y, z=segments_intersection_xy(tup_coor_1, tup_coor_2)
-        search_key=check_point_with_vertices((x, y, z), network)
-        if search_key is None:
-            ver_key=network.add_vertex(x=x, y=y, z=z)
-        else:
-            ver_key=search_key
-        if ver_key not in ver_on_edg_dic[tup_1]:   
-            ver_on_edg_dic[tup_1].append(ver_key)
-        if ver_key not in ver_on_edg_dic[tup_2]: 
-            ver_on_edg_dic[tup_2].append(ver_key) 
-            
-    return ver_on_edg_dic
-
-def sort_vertices_on_edge(network):
-    """
-    Process_Crossings Function: 
-    sorts vertex keys on an edge based on their distance to the edge[0]
-    returns dictionary of edge {crossed_edge_tup:sorted_vertiecson_edg_lis} e.g. {(sv,ev):[sv,22,30,51,ev]}
-    """
-    ver_on_edg_dic=add_vertex_at_crossings(network)
-    sorted_ver_on_edg_dic={edg: [] for edg in ver_on_edg_dic}
-    for edg, ver_lis in ver_on_edg_dic.items():
-        if len(ver_lis)>1:  # case of several crossings on one edge
-            dist_dic={}
-            dist_lis=[]
-            for key in ver_lis:
-                edg_0_coor=network.vertex_coordinates(edg[0])
-                ver_coor=network.vertex_coordinates(key)
-                dist=round(distance_between_two_points(edg_0_coor, ver_coor), 2)
-                dist_lis.append(dist)
-                dist_dic[str(dist)]=key
-            sorted_dist_lis=sorted(dist_lis)
-            sorted_ver_lis=[]
-            sorted_ver_lis.append(edg[0])
-            for dist in sorted_dist_lis:
-                sorted_ver_lis.append(dist_dic[str(dist)])
-            sorted_ver_lis.append(edg[1])
-            sorted_ver_on_edg_dic[edg]=sorted_ver_lis
-        else:  # case of one crossing on an edge
-            sorted_ver_on_edg_dic[edg]=[edg[0], ver_lis[0], edg[1]]
-    
-    return sorted_ver_on_edg_dic
-
 def process_crossings(network):
+
     """
-    Post-Processing Function:
-    when embedding is unsuccessful, vertices will be added at the crossings.
-    the crossed edges will be removed, new edges will be added
-    returns the cured network
+    This is the simple version of process_crossing for the case that there is only one crossing
+    and to generate planar groundtruss.
     """
-    # add vertices at crossings and sort the vertices on an edge
-    sorted_ver_on_edg_dic=sort_vertices_on_edge(network)
-    # delete old crossing edges and add new edges
-    for edg, ver_lis in sorted_ver_on_edg_dic.items():
-        network.delete_edge(edg[0], edg[1])
-        for ind, key_1 in enumerate(ver_lis[:-1]):
-            key_2=ver_lis[ind+1]
-            network.add_edge(key_1, key_2)
-    
+    crossings=network_find_crossings(network)  # [(edg1_tup,edg2_tup), (( , ) , ( , )), ...]
+    for tup in crossings:
+        # find ver coordinates of the two crossing edges
+        e_1=network.edge_coordinates(tup[0][0], tup[0][1])
+        e_2=network.edge_coordinates(tup[1][0], tup[1][1])
+        # find the intersection of the two edges
+        xyz=lines_intersection_xy(e_1, e_2)
+        # delete the crossing edges
+        network.delete_edge(tup[0][0], tup[0][1])
+        network.delete_edge(tup[1][0], tup[1][1])
+        # add the vertex at intersection
+        ver_key=network.add_node(x=xyz[0], y=xyz[1], z=xyz[2])
+        # add the four new edges
+        network.add_edge(ver_key, tup[0][0])
+        network.add_edge(ver_key, tup[0][1])
+        network.add_edge(ver_key, tup[1][0])
+        network.add_edge(ver_key, tup[1][1])
+
     return network
 
 def add_vertex_edge_for_load_support(network, sup_dic, load_dic, bars_len, key_removed_dic):
@@ -547,45 +447,46 @@ def add_vertex_edge_for_load_support(network, sup_dic, load_dic, bars_len, key_r
             load_dic_2.pop(key)
             load_dic_2=merge_two_dicts(load_dic_2, key_removed_dic[key])
         load_sup_dic=merge_two_dicts(sup_dic, load_dic_2)
-    # define arbitrsry r to be added to get leaf vertex coordinates
+    # define arbitrary r to be added to get leaf vertex coordinates
     max_len=max(bars_len)
     r=max_len/3.0
     
     # make a polygon and polyline from outer vertices of network
-    face_net=Mesh.from_data(network.to_data())
-    face_net.halfedge=network.halfedge
-    network_find_faces(face_net)
-    if 0 in face_net.face and len(face_net.face)>1:
-        face_net.delete_face(0)
-    if len(face_net.face)==1:  
-        ver_lis=[key for key in face_net.vertices()]
+    points = network.to_points()
+    cycles = network_find_cycles(network)
+    mesh = Mesh.from_vertices_and_faces(points, cycles)
+
+    if 0 in mesh.face and len(mesh.face)>1:
+        mesh.delete_face(0)
+    if len(mesh.face)==1:  
+        ver_lis=[key for key in mesh.vertices()]
     else:
-        ver_lis=face_net.vertices_on_boundary(ordered=True)
+        ver_lis=mesh.vertices_on_boundary(ordered=True)
      
     ver_lis_plyln=ver_lis[:]
     ver_lis_plyln.append(ver_lis[0])
-    pt_lis_plygn=[face_net.vertex_coordinates(key) for key in ver_lis]
-    pt_lis_plyln=[face_net.vertex_coordinates(key) for key in ver_lis_plyln]
+    pt_lis_plygn=[mesh.vertex_coordinates(key) for key in ver_lis]
+    pt_lis_plyln=[mesh.vertex_coordinates(key) for key in ver_lis_plyln]
     plygn=Polygon(pt_lis_plygn)
     plyln=Polyline(pt_lis_plyln)
 
     # add leaf vertices
     for key in load_sup_dic:
         if load_sup_dic[key][0]!=0.0:
-            pt_1=add_vectors(network.vertex_coordinates(key), (+r, 0.0, 0.0))
+            pt_1=add_vectors(network.node_coordinates(key), (+r, 0.0, 0.0))
             plyln_bln=is_point_on_polyline(pt_1, plyln.points, tol=0.001)
             plygn_bln=is_point_in_polygon_xy(pt_1, plygn.points)
             if plyln_bln or plygn_bln:
-                pt_1=add_vectors(network.vertex_coordinates(key), (-r, 0.0, 0.0))
-            key_2=network.add_vertex(x=np.asscalar(pt_1[0]), y=pt_1[1], z=0.0)
+                pt_1=add_vectors(network.node_coordinates(key), (-r, 0.0, 0.0))
+            key_2=network.add_node(x=np.asscalar(pt_1[0]), y=pt_1[1], z=0.0)
             network.add_edge(key, key_2)
         if load_sup_dic[key][1]!=0.0:
-            pt_2=add_vectors(network.vertex_coordinates(key), (0.0,+r, 0.0))
+            pt_2=add_vectors(network.node_coordinates(key), (0.0,+r, 0.0))
             plyln_bln=is_point_on_polyline(pt_2, plyln.points, tol=0.001)
             plygn_bln=is_point_in_polygon_xy(pt_2, plygn.points)
             if plyln_bln or plygn_bln:
-                pt_2=add_vectors(network.vertex_coordinates(key), (0.0,-r, 0.0))
-            key_2=network.add_vertex(x=pt_2[0], y=np.asscalar(pt_2[1]), z=0.0)
+                pt_2=add_vectors(network.node_coordinates(key), (0.0,-r, 0.0))
+            key_2=network.add_node(x=pt_2[0], y=np.asscalar(pt_2[1]), z=0.0)
             network.add_edge(key, key_2)
     
     return network, plygn, plyln
@@ -596,13 +497,13 @@ def ags_inputs(network):
     saves edg_dic_GT and ver_dic_GT files to be used in AGS
     """
     ags_net=Network()  # make a new network 
-    new_key_lis=range(len(network.vertex))
-    old_key_lis=list(network.vertices())
+    new_key_lis=range(len(network.node))
+    old_key_lis=list(network.nodes())
     map_key_dic=dict(zip(old_key_lis, new_key_lis))  # {old_key:new_key}
  
     for ver in map_key_dic:
-        ver_coor=network.vertex
-        ags_net.add_vertex(key=map_key_dic[ver], x=ver_coor[ver]['x'], y=ver_coor[ver]['y'], z=ver_coor[ver]['z'])
+        ver_coor=network.node
+        ags_net.add_node(key=map_key_dic[ver], x=ver_coor[ver]['x'], y=ver_coor[ver]['y'], z=ver_coor[ver]['z'])
     for edg in network.edges():
         u=map_key_dic[edg[0]]
         v=map_key_dic[edg[1]]
@@ -611,11 +512,12 @@ def ags_inputs(network):
     
     ver_dic={}
     edg_dic={}
-    for key in ags_net.vertex:
-        ver_dic[key]=ags_net.vertex_coordinates(key)
+    for key in ags_net.node:
+        ver_dic[key]=ags_net.node_coordinates(key)
     for ind_edg, edg in enumerate(ags_net.edges()):
         edg_dic[ind_edg]=edg  
     
+    # save the dictionaries to the Source folder
     with open(os.path.join(BASEDIR, 'ver_dic_GT.p'), 'wb') as fp: 
         pickle.dump(ver_dic, fp, protocol=2)
     with open(os.path.join(BASEDIR, 'edg_dic_GT.p'), 'wb') as fp:
@@ -634,8 +536,8 @@ def map_vertices_with_similar_coordinates(force_orig_net):
     """
     # make a dict of {coor: [list of keys with similar coors]}
     map_coor_key_dic={}
-    for key in force_orig_net.vertex:
-        coor=force_orig_net.vertex_coordinates(key)
+    for key in force_orig_net.node:
+        coor=force_orig_net.node_coordinates(key)
         coor_formatted=geometric_key(coor, precision='0f')  # abut_rec "d"
         if coor_formatted not in map_coor_key_dic:
             map_coor_key_dic[coor_formatted]=[]
@@ -690,8 +592,8 @@ def make_network_from_face(network, key_lis):
     """
     net=Network()
     for key in key_lis:
-        xyz=(network.vertex[key]['x'], network.vertex[key]['y'], network.vertex[key]['z'])
-        net.add_vertex(key, {'x': xyz[0], 'y': xyz[1], 'z': xyz[2]})   
+        xyz=(network.node[key]['x'], network.node[key]['y'], network.node[key]['z'])
+        net.add_node(key, {'x': xyz[0], 'y': xyz[1], 'z': xyz[2]})   
     for edg in network.edges():
         if edg[0] in key_lis and edg[1] in key_lis:
             net.add_edge(edg[0], edg[1])     
@@ -711,15 +613,15 @@ def find_inner_face_corners(network, in_dic_fc):
         net=make_network_from_face(network, lis)
         # now find the corners by looking at the angles
         for key in lis:
-            nbr_lis=net.vertex_neighbors(key)
+            nbr_lis=net.neighbors(key)
             if len(nbr_lis)>1:
-                vec_1=vector_create(net.vertex_coordinates(nbr_lis[0]), net.vertex_coordinates(key))
-                vec_2=vector_create(net.vertex_coordinates(nbr_lis[1]), net.vertex_coordinates(key))
+                vec_1=vector_create(net.node_coordinates(nbr_lis[0]), net.node_coordinates(key))
+                vec_2=vector_create(net.node_coordinates(nbr_lis[1]), net.node_coordinates(key))
                 ang=angle_between(vec_1, vec_2)
                 if round(ang, 2)!=0.00 and round(ang, 2)!=3.14:
                     corner_dic[fc_key].append(key)
                     in_corner_set.add(key)
-                elif network.vertex_degree(key)>2:
+                elif network.degree(key)>2:
                     corner_dic[fc_key].append(key)
                     in_corner_set.add(key)    
 
@@ -738,10 +640,10 @@ def find_outer_face_corners(network, out_dic_fc, in_corner_set):
         net=make_network_from_face(network, lis)
         # now find the corners by looking at the angles
         for key in lis:
-            nbr_lis=net.vertex_neighbors(key)
+            nbr_lis=net.neighbors(key)
             if len(nbr_lis)==2:  # non-leaf vertices
-                vec_1=vector_create(net.vertex_coordinates(nbr_lis[0]), net.vertex_coordinates(key))
-                vec_2=vector_create(net.vertex_coordinates(nbr_lis[1]), net.vertex_coordinates(key))
+                vec_1=vector_create(net.node_coordinates(nbr_lis[0]), net.node_coordinates(key))
+                vec_2=vector_create(net.node_coordinates(nbr_lis[1]), net.node_coordinates(key))
                 ang=angle_between(vec_1, vec_2)
                 if round(ang, 2)!=0.00 and round(ang, 2)!=3.14:
                     corner_dic[fc_key].append(key)
@@ -815,12 +717,12 @@ def make_new_network (orig_net, edg_lis):
     """
     new_net=Network()
     for edg in edg_lis:
-        coor0=orig_net.vertex_coordinates(edg[0])
-        coor1=orig_net.vertex_coordinates(edg[1])
-        if edg[0] not in new_net.vertex:
-            new_net.add_vertex(edg[0], {'x': coor0[0], 'y': coor0[1], 'z': coor0[2]})
-        if edg[1] not in new_net.vertex:    
-            new_net.add_vertex(edg[1], {'x': coor1[0], 'y': coor1[1], 'z': coor1[2]})
+        coor0=orig_net.node_coordinates(edg[0])
+        coor1=orig_net.node_coordinates(edg[1])
+        if edg[0] not in new_net.node:
+            new_net.add_node(edg[0], {'x': coor0[0], 'y': coor0[1], 'z': coor0[2]})
+        if edg[1] not in new_net.node:    
+            new_net.add_node(edg[1], {'x': coor1[0], 'y': coor1[1], 'z': coor1[2]})
         new_net.add_edge(edg[0], edg[1])
 
     return new_net
@@ -833,14 +735,14 @@ def rotate_dual(force_net, ANG):
     ver_coor_90_dic={}
     AX=[0.0, 0.0, 1.0]  # normal to the plane of rotation
     ORG=[0.0, 0.0, 0.0]
-    for key in force_net.vertex:
-        coor=force_net.vertex_coordinates(key)
+    for key in force_net.node:
+        coor=force_net.node_coordinates(key)
         pt=rotate_points([coor], ANG, AX, ORG) 
         ver_coor_90_dic[key]=np.round_(pt[0], 3).tolist()            
     # make new rotated dual network 
     force_90_net=Network()
     for key, coor in ver_coor_90_dic.items():
-        force_90_net.add_vertex(key, {'x': coor[0], 'y': coor[1], 'z': coor[2]})       
+        force_90_net.add_node(key, {'x': coor[0], 'y': coor[1], 'z': coor[2]})       
     for edg in force_net.edges():
         force_90_net.add_edge(edg[0], edg[1])    
 

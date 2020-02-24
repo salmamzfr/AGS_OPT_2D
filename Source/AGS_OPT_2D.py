@@ -1,5 +1,5 @@
 '''
-Created on 06.07.2018, updated on 22.01.2020
+Created on 06.07.2018, updated on 24.02.2020
 
 @author: Salma Mozaffari, ETH Zurich
 
@@ -8,10 +8,10 @@ Comment: Integration of AGS and LAYOPT:
         - Calculates and plots the constant stress fields
 
 Before running the code:
-        - install required packages: matplotlib, numpy, scipy, cvxpy, and compas.
+        - install required packages: matplotlib, numpy, scipy, cvxpy, and compas (has tested with compas version 15.2).
         - in the RUN section, update the directory to the "MeshObjects" folder and the specific mesh object according to your directory.
         - in the INPUTS section, uncomment the "dic_sup" and "dic_load" to impose boundary conditions (supports and external loads) on the mesh object.
-        - in the RUN section, uncomment "hf.plot_network(AO.dic_attr['gt_net'])" to see/check ground truss and the locations of supports/external loads
+        - in the RUN section, uncomment "hf.plot_network(AO.dic_attr['gt_net'])" to see/check ground truss and the nodal locations of supports/external loads
 
 After a correct run:
         - three plots of form diagram (optimized truss), force diagram, and uneditted stress fields will appear.
@@ -100,7 +100,7 @@ class AGS_OPT_2D (object):
         bars=self.dic_attr['bars']
         gt_net=Network()
         for v_key, v_attr in mesh.vertex.items():
-            gt_net.add_vertex(v_key, v_attr)
+            gt_net.add_node(v_key, v_attr)
         for edg in bars:
             gt_net.add_edge(edg[0], edg[1])
 
@@ -139,7 +139,7 @@ class AGS_OPT_2D (object):
             self.dic_attr['plygn']=plygn
             self.dic_attr['plyln']=plyln
 
-        # save edg_dic and ver_dic to be used in AGS
+        # # save edg_dic and ver_dic to be used in AGS
         if ags_bln is True:
             ppnt_net=hf.ags_inputs(ppnt_net)
 
@@ -252,11 +252,11 @@ class AGS_OPT_2D (object):
         leaf_ind_edg_dic=hf.leaf_edge_dict(edg_dic, ags_net)
         # pick one leaf edge and get the length
         leaf_edg=list(leaf_ind_edg_dic.values())[0]
-        leaf_len=hf.distance_between_two_points(ags_net.vertex_coordinates(leaf_edg[0]), ags_net.vertex_coordinates(leaf_edg[1]))
+        leaf_len=hf.distance_between_two_points(ags_net.node_coordinates(leaf_edg[0]), ags_net.node_coordinates(leaf_edg[1]))
         # find non-leaf edge indices and save them
         non_leaf_edg_ind_lis=[ind for ind in edg_dic if ind not in list(leaf_ind_edg_dic.keys())]
         # pick the needed bars_len for opt
-        ver_coor=np.array([ags_net.vertex_coordinates(key, 'xy') for key in ags_net.vertex])
+        ver_coor=np.array([ags_net.node_coordinates(key, 'xy') for key in ags_net.node])
         all_bars=np.array(list(edg_dic.values()))
         _, all_bars_len, all_norm_dir=hf.bar_properties(all_bars, ver_coor)
         bars_len=np.array([edg_len for ind, edg_len in enumerate(all_bars_len) if ind in non_leaf_edg_ind_lis])
@@ -336,7 +336,7 @@ class AGS_OPT_2D (object):
             if edg[1] not in leaf_ver_lis:
                 sp=edg[1]  # key
                 ep=edg[0]  # to get correct unit vec direction in "edg_unit_vec"
-            edg_unit_vec=hf.unit_vector(hf.vector_create(ags_net.vertex_coordinates(sp), ags_net.vertex_coordinates(ep)))
+            edg_unit_vec=hf.unit_vector(hf.vector_create(ags_net.node_coordinates(sp), ags_net.node_coordinates(ep)))
             edg_ang=round(hf.angle_between(edg_unit_vec, (1.0, 0.0, 0.0)), 2)
             edg_unit_vec_dic[ind]=edg_unit_vec
             # find which dofs has the vertex key (sp) and which leaf edge has which dof
@@ -520,8 +520,8 @@ class AGS_OPT_2D (object):
 
         # dictionary of dual vertices
         dual_ver_dic={}
-        for key in force_net.vertices():
-            dual_ver_dic[key]=force_net.vertex_coordinates(key)
+        for key in force_net.nodes():
+            dual_ver_dic[key]=force_net.node_coordinates(key)
 
         # ### save the data to draw form and force diagrams in Rhino ###
         with open(os.path.join(BASEDIR, 'map_edg_dic.p'), 'wb') as fp:
@@ -561,10 +561,10 @@ class AGS_OPT_2D (object):
                 CONST=1
             else: 
                 CONST=2   
-            coor1=form_net.vertex_coordinates(edg[0])
-            coor2=form_net.vertex_coordinates(edg[1])
-            dual_coor1=force_90_net.vertex_coordinates(dual_edg[0])
-            dual_coor2=force_90_net.vertex_coordinates(dual_edg[1])
+            coor1=form_net.node_coordinates(edg[0])
+            coor2=form_net.node_coordinates(edg[1])
+            dual_coor1=force_90_net.node_coordinates(dual_edg[0])
+            dual_coor2=force_90_net.node_coordinates(dual_edg[1])
             sc_pts_lis=scale_points([dual_coor1, dual_coor2], SC)
             if new_edg_f_dic[edg]>self.den_tol:  # tension
                 line_pts_lis=hf.sf_cl_anchor_lines(sc_pts_lis, [coor1, coor2], CONST)
@@ -615,12 +615,12 @@ dic_load={20:[0.0, -100.0]}
 #************ get the initial meshed concrete block and create ground truss ************
 AO=AGS_OPT_2D(dic_sup, dic_load)
 # !!! ENTER THE CORRECT DIRECTORY BELOW: !!!
-AO.create_mesh(r'C:\Users\msalma\...\AGS_OPT_2D\MeshObjects\mesh_cant.obj')
-# hf.plot_mesh(AO.dic_attr['mesh'])  #!uncomment to see the ground truss 
+AO.create_mesh(r'C:\Users\...\MeshObjects\mesh_cant.obj')
+# hf.plot_mesh(AO.dic_attr['mesh'])  #!uncomment to see the input mesh
 AO.struct_domain(AO.dic_attr['mesh'])
 AO.generate_ground_truss()
 AO.network_from_ground_truss()
-# hf.plot_network(AO.dic_attr['gt_net'])
+# hf.plot_network(AO.dic_attr['gt_net']) #!uncomment to see the ground truss
 
 # ************ add vertices at intersections and add load/sup edges to gt_net  ************
 ags_net=AO.post_processing(False, False, True, True, True, AO.dic_attr['gt_net'])
