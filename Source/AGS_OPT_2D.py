@@ -298,9 +298,9 @@ class AGS_OPT_2D (object):
         a_var=cvx.Variable((n_bars,1))
         q_var=cvx.Variable((n_bars,1))
         q_var_len=cvx.multiply(bars_len, q_var)  #q_var is the force density
-        vol=bars_len.T*a_var
+        vol=bars_len.T@a_var
         ind_diag=list(self.dic_attr['diag_bars_dic'].keys())
-        constraints=[A_eq*q_var==b_eq, a_var>=10e-8, q_var_len-self.sig_t*a_var<=0.0, -q_var_len-self.sig_c*a_var<=0.0, q_var[ind_diag]<=0.0]
+        constraints=[A_eq@q_var==b_eq, a_var>=10e-8, q_var_len-self.sig_t*a_var<=0.0, -q_var_len-self.sig_c*a_var<=0.0, q_var[ind_diag]<=0.0]
         prob=cvx.Problem(cvx.Minimize(vol), constraints)
         prob.solve()
         print ("status:", prob.status)
