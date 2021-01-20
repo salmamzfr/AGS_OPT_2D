@@ -21,7 +21,7 @@ To cite the work and the script, please use below BibTeX:
   pages={106335},<br/>
   year={2020},<br/>
   publisher={Elsevier},<br/>
-  url = {https://www.sciencedirect.com/science/article/pii/S0045794920301383}
+  url = {https://www.sciencedirect.com/science/article/pii/S0045794920301383},<br/>
 }
 
 
