@@ -13,14 +13,14 @@ The scripts in the "Rhino" folder help in the re-production of results (i.e., fo
 
 To cite the work and the script, please use below BibTeX:
 
-@article{mozaffari2020,
-  title={Graphic statics in a continuum: Strut-and-tie models for reinforced concrete},
-  author={Mozaffari, Salma and Akbarzadeh, Masoud and Vogel, Thomas},
-  journal={Computers \& Structures},
-  volume={240},
-  pages={106335},
-  year={2020},
-  publisher={Elsevier}
+@article{mozaffari2020,<br/>
+  title={Graphic statics in a continuum: Strut-and-tie models for reinforced concrete},<br/>
+  author={Mozaffari, Salma and Akbarzadeh, Masoud and Vogel, Thomas},<br/>
+  journal={Computers \& Structures},<br/>
+  volume={240},<br/>
+  pages={106335},<br/>
+  year={2020},<br/>
+  publisher={Elsevier},<br/>
   url = {https://www.sciencedirect.com/science/article/pii/S0045794920301383}
 }
 
