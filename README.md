@@ -11,7 +11,19 @@ The "Source" folder includes the main scripts. "AGS_OPT_2D" runs the algorithm a
 
 The scripts in the "Rhino" folder help in the re-production of results (i.e., form, force, and stress fields) in Rhino, after running the main script "AGS_OPT_2D". 
 
-To cite the work, please use below BibTeX:
+To cite the work and the script, please use below BibTeX:
+
+@article{mozaffari2020,
+  title={Graphic statics in a continuum: Strut-and-tie models for reinforced concrete},
+  author={Mozaffari, Salma and Akbarzadeh, Masoud and Vogel, Thomas},
+  journal={Computers \& Structures},
+  volume={240},
+  pages={106335},
+  year={2020},
+  publisher={Elsevier}
+  url = {https://www.sciencedirect.com/science/article/pii/S0045794920301383}
+}
+
 
 @misc{ags-opt,<br/>
   author = {Mozaffari, Salma},<br/>
@@ -21,5 +33,6 @@ To cite the work, please use below BibTeX:
   doi = {10.5281/zenodo.3628672},<br/>
   url = { https://github.com/salmamzfr/AGS_OPT_2D },<br/>
 }
+
 
 In case of questions, please contact mozaffari@ibk.baug.ethz.ch
