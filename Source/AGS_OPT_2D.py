@@ -586,27 +586,27 @@ dic_load={20:[0.0, -100.0]}
 # dic_sup={48:[1, 1], 4:[0, 1]}
 # dic_load={55:[-50.0, 0.0]}
 
-# mesh_ssb (simply-supported beam-Fig.8)
+# mesh_ssb (simply-supported beam-Fig.9)
 # dic_sup={0:[1, 1], 12:[0, 1]}  
 # dic_load={56:[0.0, -200.0], 60:[0.0, -200.0]} 
 
-# mesh_step (stepped beam-Fig.8)
+# mesh_step (stepped beam-Fig.9)
 # dic_sup={52:[1, 1], 32:[1, 0]}
 # dic_load={31:[400.0, 0.0], 7:[-400.0, 0.0]}
 
-# mesh_joint (frame joint-Fig.8)
+# mesh_joint (frame joint-Fig.9)
 # dic_sup={30:[1, 1], 0:[0, 1]}
 # dic_load={40:[400, 0.0], 43:[-400.0, 00.0]}
 
-# mesh_dap (depped-end beam-Fig.8)
+# mesh_dap (depped-end beam-Fig.9)
 # dic_sup={12:[0, 1], 0:[1, 1]}
 # dic_load={9:[-250.0, 0.0], 6:[250.0, 0.0], 7:[-75.0, -75.0]} 
 
-# mesh_hhp (hammerhead pier-Fig.8)
+# mesh_hhp (hammerhead pier-Fig.9)
 # dic_sup={33:[1, 1], 37:[1, 1]}
 # dic_load={23:[0.0, -80.0], 27:[0.0, -30.0], 31:[0.0, -10.0]}
 
-# mesh_wall (wall with opening-Fig.8)
+# mesh_wall (wall with opening-Fig.9)
 # dic_sup={3:[1, 1], 67:[0, 1]} 
 # dic_load={61:[0.0, -400.0]}
 
