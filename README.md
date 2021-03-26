@@ -1,9 +1,9 @@
 # AGS-OPT
 <a href="https://zenodo.org/badge/latestdoi/235868917"><img src="https://zenodo.org/badge/235868917.svg" alt="DOI"></a>
 
-## The integration of Algebraic Graphic Statics and Layout Optimization
+## The integration of 2D Algebraic Graphic Statics and Layout Optimization
 
-The algorithm produces a form diagram(i.e., a valid strut-and-tie model), force diagram, and constant stress fields for given boundary conditions and design domain of a reinforced concrete block.
+The algorithm produces a form diagram(i.e., a valid 2D strut-and-tie model), force diagram, and constant stress fields for given boundary conditions and design domain of a reinforced concrete block.
 
 The algorithm is developed by Salma Moaffari at ETH Zurich. It is written in Python 3.7 (https://www.python.org), where the algebraic implementations use NumPy (http://www.numpy.org) and SciPy (http://www.scipy.org) packages, the linear optimization is performed with the CVXPY package (https://www.cvxpy.org), which solves convex optimization problems. Also, the data structures such as meshes and graphs are created or modified using COMPAS 0.15.4 (http://compas-dev.github.io).
 
