@@ -1,7 +1,7 @@
-# AGS-OPT
+# AGS-OPT-2D
 <a href="https://zenodo.org/badge/latestdoi/235868917"><img src="https://zenodo.org/badge/235868917.svg" alt="DOI"></a>
 
-## The integration of 2D Algebraic Graphic Statics and Layout Optimization
+## The integration of Algebraic Graphic Statics and Layout Optimization
 
 The algorithm produces a form diagram(i.e., a valid 2D strut-and-tie model), force diagram, and constant stress fields for given boundary conditions and design domain of a reinforced concrete block.
 
@@ -27,7 +27,7 @@ To cite the work and the script, please use below BibTeX:
 
 @misc{ags-opt,<br/>
   author = {Mozaffari, Salma},<br/>
-  title = {AGS-OPT: The integration of Algebraic Graphic Statics and Layout Optimization},<br/>
+  title = {AGS-OPT-2D: The integration of Algebraic Graphic Statics and Layout Optimization},<br/>
   year = {2020},<br/>
   version = {1.0.0},<br/>
   doi = {10.5281/zenodo.3628672},<br/>
