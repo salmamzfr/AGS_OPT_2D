@@ -8,7 +8,7 @@ Comment: Integration of AGS and LAYOPT:
         - Calculates and plots the constant stress fields
 
 Before running the code:
-        - install required packages: matplotlib, numpy, scipy, cvxpy, and compas (has tested with compas version 15.2).
+        - install required packages: matplotlib, numpy, scipy, cvxpy, and compas (has tested with compas version 15.4).
         - in the RUN section, update the directory to the "MeshObjects" folder and the specific mesh object according to your directory.
         - in the INPUTS section, uncomment the "dic_sup" and "dic_load" to impose boundary conditions (supports and external loads) on the mesh object.
         - in the RUN section, uncomment "hf.plot_network(AO.dic_attr['gt_net'])" to see/check ground truss and the nodal locations of supports/external loads
