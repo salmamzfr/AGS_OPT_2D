@@ -1,7 +1,7 @@
 # AGS_OPT_2D
 <a href="https://zenodo.org/badge/latestdoi/235868917"><img src="https://zenodo.org/badge/235868917.svg" alt="DOI"></a>
 
-## The integration of Algebraic Graphic Statics and Layout Optimization
+## The integration of Algebraic Graphic Statics and Layout Optimization for Computational Strut-and-Tie Modeling
 
 The algorithm produces a form diagram(i.e., a valid 2D strut-and-tie model), force diagram, and constant stress fields for given boundary conditions and design domain of a reinforced concrete block.
 
